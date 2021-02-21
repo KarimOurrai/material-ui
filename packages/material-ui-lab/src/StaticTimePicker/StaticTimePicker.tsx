@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { makePickerWithStateAndWrapper } from '../internal/pickers/Picker/makePickerWithState';
+import { makePickerWithState } from '../internal/pickers/Picker/makePickerWithState';
 import {
   BaseTimePickerProps,
   timePickerConfig,
@@ -14,10 +14,14 @@ import { StaticWrapper } from '../internal/pickers/wrappers/Wrapper';
  *
  * - [StaticTimePicker API](https://material-ui.com/api/static-time-picker/)
  */
-const StaticTimePicker = makePickerWithStateAndWrapper<BaseTimePickerProps>(StaticWrapper, {
+const StaticTimePicker = makePickerWithState<BaseTimePickerProps>(StaticWrapper, {
   name: 'MuiStaticTimePicker',
   ...timePickerConfig,
 }) as TimePickerGenericComponent<typeof StaticWrapper>;
+
+if (process.env.NODE_ENV !== 'production') {
+  (StaticTimePicker as any).displayName = 'StaticTimePicker';
+}
 
 StaticTimePicker.propTypes = {
   // ----------------------------- Warning --------------------------------
@@ -53,7 +57,7 @@ StaticTimePicker.propTypes = {
    */
   className: PropTypes.string,
   /**
-   * Allows to pass configured date-io adapter directly. More info [here](https://next.material-ui-pickers.dev/guides/date-adapter-passing)
+   * Allows to pass configured date-io adapter directly. More info [here](https://next.material-ui-pickers.dev/guides/date-adapter-passing).
    * ```jsx
    * dateAdapter={new AdapterDateFns({ locale: ruLocale })}
    * ```
@@ -84,7 +88,7 @@ StaticTimePicker.propTypes = {
    */
   disableOpenPicker: PropTypes.bool,
   /**
-   * Force static wrapper inner components to be rendered in mobile or desktop mode
+   * Force static wrapper inner components to be rendered in mobile or desktop mode.
    * @default "static"
    */
   displayStaticWrapperAs: PropTypes.oneOf(['desktop', 'mobile']),
@@ -123,7 +127,7 @@ StaticTimePicker.propTypes = {
    */
   label: PropTypes.node,
   /**
-   * Custom mask. Can be used to override generate from format. (e.g. __/__/____ __:__ or __/__/____ __:__ _M)
+   * Custom mask. Can be used to override generate from format. (e.g. `__/__/____ __:__` or `__/__/____ __:__ _M`).
    */
   mask: PropTypes.string,
   /**
@@ -154,7 +158,7 @@ StaticTimePicker.propTypes = {
    */
   onAccept: PropTypes.func,
   /**
-   * Callback fired when the value (the selected date) changes. @DateIOType.
+   * Callback fired when the value (the selected date) changes @DateIOType.
    */
   onChange: PropTypes.func.isRequired,
   /**
@@ -253,7 +257,7 @@ StaticTimePicker.propTypes = {
    * Array of views to show.
    */
   views: PropTypes.arrayOf(PropTypes.oneOf(['hours', 'minutes', 'seconds']).isRequired),
-};
+} as any;
 
 export type StaticTimePickerProps = React.ComponentProps<typeof StaticTimePicker>;
 

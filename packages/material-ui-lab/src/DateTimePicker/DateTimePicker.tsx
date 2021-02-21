@@ -11,7 +11,7 @@ import {
 } from '../internal/pickers/hooks/date-helpers-hooks';
 import { ExportedDayPickerProps } from '../DayPicker/DayPicker';
 import {
-  makePickerWithStateAndWrapper,
+  makePickerWithState,
   SharedPickerProps,
 } from '../internal/pickers/Picker/makePickerWithState';
 import { SomeWrapper } from '../internal/pickers/wrappers/Wrapper';
@@ -125,23 +125,24 @@ export const dateTimePickerConfig = {
   DefaultToolbarComponent: DateTimePickerToolbar,
 };
 
-export type DateTimePickerGenericComponent<TWrapper extends SomeWrapper> = <TDate>(
+export type DateTimePickerGenericComponent<TWrapper extends SomeWrapper> = (<TDate>(
   props: BaseDateTimePickerProps<TDate> & SharedPickerProps<TDate, TWrapper>,
-) => JSX.Element;
+) => JSX.Element) & { propTypes?: unknown };
 
 /**
  * @ignore - do not document.
  */
 /* @typescript-to-proptypes-generate */
-const DateTimePicker = makePickerWithStateAndWrapper<BaseDateTimePickerProps<unknown>>(
-  ResponsiveWrapper,
-  {
-    name: 'MuiDateTimePicker',
-    ...dateTimePickerConfig,
-  },
-) as DateTimePickerGenericComponent<typeof ResponsiveWrapper>;
+const DateTimePicker = makePickerWithState<BaseDateTimePickerProps<unknown>>(ResponsiveWrapper, {
+  name: 'MuiDateTimePicker',
+  ...dateTimePickerConfig,
+}) as DateTimePickerGenericComponent<typeof ResponsiveWrapper>;
 
-(DateTimePicker as any).propTypes = {
+if (process.env.NODE_ENV !== 'production') {
+  (DateTimePicker as any).displayName = 'DateTimePicker';
+}
+
+DateTimePicker.propTypes = {
   // ----------------------------- Warning --------------------------------
   // | These PropTypes are generated from the TypeScript type definitions |
   // |     To update them edit TypeScript types and run "yarn proptypes"  |
@@ -172,7 +173,7 @@ const DateTimePicker = makePickerWithStateAndWrapper<BaseDateTimePickerProps<unk
    */
   ampmInClock: PropTypes.bool,
   /**
-   * Cancel text message
+   * Cancel text message.
    * @default "CANCEL"
    */
   cancelText: PropTypes.node,
@@ -190,7 +191,7 @@ const DateTimePicker = makePickerWithStateAndWrapper<BaseDateTimePickerProps<unk
    */
   clearable: PropTypes.bool,
   /**
-   * Clear text message
+   * Clear text message.
    * @default "CLEAR"
    */
   clearText: PropTypes.node,
@@ -213,7 +214,7 @@ const DateTimePicker = makePickerWithStateAndWrapper<BaseDateTimePickerProps<unk
    */
   componentsProps: PropTypes.object,
   /**
-   * Allows to pass configured date-io adapter directly. More info [here](https://next.material-ui-pickers.dev/guides/date-adapter-passing)
+   * Allows to pass configured date-io adapter directly. More info [here](https://next.material-ui-pickers.dev/guides/date-adapter-passing).
    * ```jsx
    * dateAdapter={new AdapterDateFns({ locale: ruLocale })}
    * ```
@@ -330,7 +331,7 @@ const DateTimePicker = makePickerWithStateAndWrapper<BaseDateTimePickerProps<unk
    */
   loading: PropTypes.bool,
   /**
-   * Custom mask. Can be used to override generate from format. (e.g. __/__/____ __:__ or __/__/____ __:__ _M)
+   * Custom mask. Can be used to override generate from format. (e.g. `__/__/____ __:__` or `__/__/____ __:__ _M`).
    */
   mask: PropTypes.string,
   /**
@@ -402,7 +403,7 @@ const DateTimePicker = makePickerWithStateAndWrapper<BaseDateTimePickerProps<unk
    */
   onAccept: PropTypes.func,
   /**
-   * Callback fired when the value (the selected date) changes. @DateIOType.
+   * Callback fired when the value (the selected date) changes @DateIOType.
    */
   onChange: PropTypes.func.isRequired,
   /**
@@ -470,7 +471,7 @@ const DateTimePicker = makePickerWithStateAndWrapper<BaseDateTimePickerProps<unk
    */
   reduceAnimations: PropTypes.bool,
   /**
-   * Custom renderer for day. Check [DayComponentProps api](https://material-ui-pickers.dev/api/Day) @DateIOType.
+   * Custom renderer for day. Check the [PickersDay](https://material-ui.com/api/pickers-day/) component.
    */
   renderDay: PropTypes.func,
   /**
@@ -506,7 +507,7 @@ const DateTimePicker = makePickerWithStateAndWrapper<BaseDateTimePickerProps<unk
   shouldDisableTime: PropTypes.func,
   /**
    * Disable specific years dynamically.
-   * Works like `shouldDisableDate` but for year selection view. @DateIOType.
+   * Works like `shouldDisableDate` but for year selection view @DateIOType.
    */
   shouldDisableYear: PropTypes.func,
   /**
@@ -528,7 +529,7 @@ const DateTimePicker = makePickerWithStateAndWrapper<BaseDateTimePickerProps<unk
    */
   timeIcon: PropTypes.node,
   /**
-   * Today text message
+   * Today text message.
    * @default "TODAY"
    */
   todayText: PropTypes.node,
@@ -569,7 +570,7 @@ const DateTimePicker = makePickerWithStateAndWrapper<BaseDateTimePickerProps<unk
   views: PropTypes.arrayOf(
     PropTypes.oneOf(['date', 'hours', 'minutes', 'month', 'year']).isRequired,
   ),
-};
+} as any;
 
 export type DateTimePickerProps = React.ComponentProps<typeof DateTimePicker>;
 

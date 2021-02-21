@@ -109,6 +109,7 @@ export const componentSettings = {
       'indeterminateIcon',
       'onChange',
       'required',
+      'sx',
       'type',
       'value',
     ],
@@ -127,6 +128,7 @@ export const componentSettings = {
       'children',
       'onDelete',
       // FIXME: `Union`
+      'sx',
       'variant',
     ],
     propValues: {
@@ -144,7 +146,7 @@ export const componentSettings = {
     template: 'chip.txt',
   },
   CircularProgress: {
-    ignoredProps: ['disableShrink', 'size'],
+    ignoredProps: ['disableShrink', 'size', 'sx'],
     propValues: {
       width: 44,
       height: 44,
@@ -199,7 +201,14 @@ export const componentSettings = {
     template: 'icon_button.txt',
   },
   ListItem: {
-    ignoredProps: ['children', 'ContainerComponent', 'ContainerProps', 'sx'],
+    ignoredProps: [
+      'children',
+      'ContainerComponent',
+      'ContainerProps',
+      'components',
+      'componentsProps',
+      'sx',
+    ],
     propValues: {
       width: 568,
       height: 48,
@@ -293,7 +302,7 @@ export const componentSettings = {
     template: 'snackbar_content.txt',
   },
   Switch: {
-    ignoredProps: ['checkedIcon', 'edge', 'icon', 'onChange', 'required', 'type', 'value'],
+    ignoredProps: ['checkedIcon', 'edge', 'icon', 'onChange', 'required', 'sx', 'type', 'value'],
     propValues: {
       label: "'Switch'",
       width: 100,

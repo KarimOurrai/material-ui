@@ -13,9 +13,6 @@ const forbidCreateStylesMessage =
 
 module.exports = {
   root: true, // So parent files don't get applied
-  globals: {
-    preval: false, // Used in the documentation
-  },
   env: {
     es6: true,
     browser: true,
@@ -92,12 +89,18 @@ module.exports = {
     // Destructuring harm grep potential.
     'prefer-destructuring': 'off',
 
-    // TODO performance consideration
+    // disabled type-aware linting due to performance considerations
     '@typescript-eslint/dot-notation': 'off',
-    // TODO performance consideration
+    'dot-notation': 'error',
+    // disabled type-aware linting due to performance considerations
     '@typescript-eslint/no-implied-eval': 'off',
-    // TODO performance consideration
+    'no-implied-eval': 'error',
+    // disabled type-aware linting due to performance considerations
     '@typescript-eslint/no-throw-literal': 'off',
+    'no-throw-literal': 'error',
+    // disabled type-aware linting due to performance considerations
+    '@typescript-eslint/return-await': 'off',
+    'no-return-await': 'error',
 
     // Not sure why it doesn't work
     'import/named': 'off',

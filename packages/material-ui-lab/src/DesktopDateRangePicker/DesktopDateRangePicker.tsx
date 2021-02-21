@@ -7,11 +7,15 @@ import DesktopTooltipWrapper from '../internal/pickers/wrappers/DesktopTooltipWr
  */
 /* @typescript-to-proptypes-generate */
 const DesktopDateRangePicker = makeDateRangePicker(
-  'MuiPickersDateRangePicker',
+  'MuiDesktopDateRangePicker',
   DesktopTooltipWrapper,
 );
 
-(DesktopDateRangePicker as any).propTypes = {
+if (process.env.NODE_ENV !== 'production') {
+  (DesktopDateRangePicker as any).displayName = 'DesktopDateRangePicker';
+}
+
+DesktopDateRangePicker.propTypes = {
   // ----------------------------- Warning --------------------------------
   // | These PropTypes are generated from the TypeScript type definitions |
   // |     To update them edit TypeScript types and run "yarn proptypes"  |
@@ -63,7 +67,7 @@ const DesktopDateRangePicker = makeDateRangePicker(
    */
   componentsProps: PropTypes.object,
   /**
-   * Allows to pass configured date-io adapter directly. More info [here](https://next.material-ui-pickers.dev/guides/date-adapter-passing)
+   * Allows to pass configured date-io adapter directly. More info [here](https://next.material-ui-pickers.dev/guides/date-adapter-passing).
    * ```jsx
    * dateAdapter={new AdapterDateFns({ locale: ruLocale })}
    * ```
@@ -75,7 +79,7 @@ const DesktopDateRangePicker = makeDateRangePicker(
    */
   defaultCalendarMonth: PropTypes.any,
   /**
-   * if `true` after selecting `start` date  calendar will not automatically switch to the month of `end` date
+   * If `true`, after selecting `start` date calendar will not automatically switch to the month of `end` date.
    * @default false
    */
   disableAutoMonthSwitching: PropTypes.bool,
@@ -162,7 +166,7 @@ const DesktopDateRangePicker = makeDateRangePicker(
    */
   loading: PropTypes.bool,
   /**
-   * Custom mask. Can be used to override generate from format. (e.g. __/__/____ __:__ or __/__/____ __:__ _M)
+   * Custom mask. Can be used to override generate from format. (e.g. `__/__/____ __:__` or `__/__/____ __:__ _M`).
    */
   mask: PropTypes.string,
   /**
@@ -180,7 +184,7 @@ const DesktopDateRangePicker = makeDateRangePicker(
    */
   onAccept: PropTypes.func,
   /**
-   * Callback fired when the value (the selected date) changes. @DateIOType.
+   * Callback fired when the value (the selected date) changes @DateIOType.
    */
   onChange: PropTypes.func.isRequired,
   /**
@@ -282,7 +286,7 @@ const DesktopDateRangePicker = makeDateRangePicker(
   shouldDisableDate: PropTypes.func,
   /**
    * Disable specific years dynamically.
-   * Works like `shouldDisableDate` but for year selection view. @DateIOType.
+   * Works like `shouldDisableDate` but for year selection view @DateIOType.
    */
   shouldDisableYear: PropTypes.func,
   /**
@@ -332,7 +336,7 @@ const DesktopDateRangePicker = makeDateRangePicker(
       PropTypes.string,
     ]),
   ).isRequired,
-};
+} as any;
 
 export type DesktopDateRangePickerProps = React.ComponentProps<typeof DesktopDateRangePicker>;
 

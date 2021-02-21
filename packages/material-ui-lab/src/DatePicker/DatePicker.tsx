@@ -16,7 +16,7 @@ import {
   defaultMaxDate,
 } from '../internal/pickers/constants/prop-types';
 import {
-  makePickerWithStateAndWrapper,
+  makePickerWithState,
   AllPickerProps,
   SharedPickerProps,
 } from '../internal/pickers/Picker/makePickerWithState';
@@ -62,20 +62,31 @@ export const datePickerConfig = {
   },
 };
 
-export type DatePickerGenericComponent<TWrapper extends SomeWrapper> = <TDate>(
+export type DatePickerGenericComponent<TWrapper extends SomeWrapper> = (<TDate>(
   props: BaseDatePickerProps<TDate> & SharedPickerProps<TDate, TWrapper>,
-) => JSX.Element;
+) => JSX.Element) & { propTypes?: any };
 
 /**
- * @ignore - do not document.
+ *
+ * Demos:
+ *
+ * - [Date Picker](https://material-ui.com/components/date-picker/)
+ *
+ * API:
+ *
+ * - [DatePicker API](https://material-ui.com/api/date-picker/)
  */
-/* @typescript-to-proptypes-generate */
-const DatePicker = makePickerWithStateAndWrapper<BaseDatePickerProps<unknown>>(ResponsiveWrapper, {
+// @typescript-to-proptypes-generate
+const DatePicker = makePickerWithState<BaseDatePickerProps<unknown>>(ResponsiveWrapper, {
   name: 'MuiDatePicker',
   ...datePickerConfig,
 }) as DatePickerGenericComponent<typeof MobileWrapper>;
 
-(DatePicker as any).propTypes = {
+if (process.env.NODE_ENV !== 'production') {
+  (DatePicker as any).displayName = 'DatePicker';
+}
+
+DatePicker.propTypes = {
   // ----------------------------- Warning --------------------------------
   // | These PropTypes are generated from the TypeScript type definitions |
   // |     To update them edit TypeScript types and run "yarn proptypes"  |
@@ -86,7 +97,7 @@ const DatePicker = makePickerWithStateAndWrapper<BaseDatePickerProps<unknown>>(R
    */
   acceptRegex: PropTypes.instanceOf(RegExp),
   /**
-   * Cancel text message
+   * Cancel text message.
    * @default "CANCEL"
    */
   cancelText: PropTypes.node,
@@ -104,12 +115,12 @@ const DatePicker = makePickerWithStateAndWrapper<BaseDatePickerProps<unknown>>(R
    */
   clearable: PropTypes.bool,
   /**
-   * Clear text message
+   * Clear text message.
    * @default "CLEAR"
    */
   clearText: PropTypes.node,
   /**
-   * Allows to pass configured date-io adapter directly. More info [here](https://next.material-ui-pickers.dev/guides/date-adapter-passing)
+   * Allows to pass configured date-io adapter directly. More info [here](https://next.material-ui-pickers.dev/guides/date-adapter-passing).
    * ```jsx
    * dateAdapter={new AdapterDateFns({ locale: ruLocale })}
    * ```
@@ -168,7 +179,7 @@ const DatePicker = makePickerWithStateAndWrapper<BaseDatePickerProps<unknown>>(R
    */
   label: PropTypes.node,
   /**
-   * Custom mask. Can be used to override generate from format. (e.g. __/__/____ __:__ or __/__/____ __:__ _M)
+   * Custom mask. Can be used to override generate from format. (e.g. `__/__/____ __:__` or `__/__/____ __:__ _M`).
    */
   mask: PropTypes.string,
   /**
@@ -199,7 +210,7 @@ const DatePicker = makePickerWithStateAndWrapper<BaseDatePickerProps<unknown>>(R
    */
   onAccept: PropTypes.func,
   /**
-   * Callback fired when the value (the selected date) changes. @DateIOType.
+   * Callback fired when the value (the selected date) changes @DateIOType.
    */
   onChange: PropTypes.func.isRequired,
   /**
@@ -264,7 +275,7 @@ const DatePicker = makePickerWithStateAndWrapper<BaseDatePickerProps<unknown>>(R
    */
   showToolbar: PropTypes.bool,
   /**
-   * Today text message
+   * Today text message.
    * @default "TODAY"
    */
   todayText: PropTypes.node,
@@ -295,7 +306,7 @@ const DatePicker = makePickerWithStateAndWrapper<BaseDatePickerProps<unknown>>(R
     PropTypes.number,
     PropTypes.string,
   ]),
-};
+} as any;
 
 export type DatePickerProps = React.ComponentProps<typeof DatePicker>;
 

@@ -1,6 +1,10 @@
 version: 2.1
 
 parameters:
+  react-dist-tag:
+    description: The dist-tag of react to be used
+    type: string
+    default: stable
   workflow:
     description: The name of the workflow to run
     type: string
@@ -11,7 +15,7 @@ defaults: &defaults
     react-dist-tag:
       description: The dist-tag of react to be used
       type: string
-      default: stable
+      default: << pipeline.parameters.react-dist-tag >>
     test-gate:
       description: A particular type of tests that should be run
       type: string
@@ -34,6 +38,12 @@ defaults: &defaults
 
 commands:
   install_js:
+    parameters:
+      browsers:
+        type: boolean
+        default: false
+        description: 'Set to true if you intend to any browser (e.g. with playwright).'
+
     steps:
       - run:
           name: View install environment
@@ -47,17 +57,56 @@ commands:
             # log a patch for maintainers who want to check out this change
             git --no-pager diff HEAD
       - restore_cache:
+          name: Restore yarn cache
           keys:
-            - v2-yarn-sha-{{ checksum "yarn.lock" }}
-            - v2-yarn-sha-
-      - restore_cache:
-          keys:
-            - v1-playwright-{{ arch }}-{{ checksum "yarn.lock" }}
-            - v1-playwright-{{ arch }}-
-            - v1-playwright-
+            - v7-yarn-{{ checksum "yarn.lock" }}
+            - v7-yarn-
+      - run:
+          name: Set yarn cache folder
+          command: |
+            # Keep path in sync with `save_cache` for key "v7-yarn-"
+            yarn config set cache-folder /tmp/yarn-cache
+            # Debug information
+            yarn cache dir
+            yarn cache list
+      - when:
+          condition: << parameters.browsers >>
+          steps:
+            - run:
+                name: Prepare playwright hash
+                command: yarn --json list --pattern playwright > /tmp/playwright_info.json
+            - store_artifacts:
+                name: Debug playwright hash
+                path: /tmp/playwright_info.json
+            - restore_cache:
+                name: Restore playwright cache
+                keys:
+                  - v5-playwright-{{ arch }}-{{ checksum "/tmp/playwright_info.json" }}
+                  - v5-playwright-{{ arch }}-
+                  - v5-playwright-
       - run:
           name: Install js dependencies
-          command: yarn
+          command: yarn install --verbose
+          environment:
+            PLAYWRIGHT_BROWSERS_PATH: /tmp/pw-browsers
+            PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: <<# parameters.browsers >>0<</ parameters.browsers >><<^ parameters.browsers >>1<</ parameters.browsers >>
+      - save_cache:
+          name: Save yarn cache
+          key: v7-yarn-{{ checksum "yarn.lock" }}
+          paths:
+            # Keep path in sync with "Set yarn cache folder"
+            # Can't use environment variables for `save_cache` paths (tested in https://app.circleci.com/pipelines/github/mui-org/material-ui/37813/workflows/5b1e207f-ac8b-44e7-9ba4-d0f9a01f5c55/jobs/223370)
+            - /tmp/yarn-cache
+      - when:
+          condition: << parameters.browsers >>
+          steps:
+            - save_cache:
+                name: Save playwright cache
+                key: v5-playwright-{{ arch }}-{{ checksum "/tmp/playwright_info.json" }}
+                paths:
+                  # Keep path in sync with "Install js dependencies"
+                  # Can't use environment variables for `save_cache` paths (tested in https://app.circleci.com/pipelines/github/mui-org/material-ui/37813/workflows/5b1e207f-ac8b-44e7-9ba4-d0f9a01f5c55/jobs/223370)
+                  - /tmp/pw-browsers
 
 jobs:
   checkout:
@@ -65,20 +114,17 @@ jobs:
     steps:
       - checkout
       - install_js
-      - run:
-          name: Should not have any git not staged
-          command: git diff --exit-code
-      - run:
-          name: Check for duplicated packages
-          command: yarn deduplicate
-      - save_cache:
-          key: v1-playwright-{{ arch }}-{{ checksum "yarn.lock" }}
-          paths:
-            - ~/.cache/ms-playwright
-      - save_cache:
-          key: v2-yarn-sha-{{ checksum "yarn.lock" }}
-          paths:
-            - ~/.cache/yarn/v4
+      - when:
+          # Install can be "dirty" when running with non-default versions of React
+          condition:
+            equal: [<< parameters.react-dist-tag >>, stable]
+          steps:
+            - run:
+                name: Should not have any git not staged
+                command: git diff --exit-code
+            - run:
+                name: Check for duplicated packages
+                command: yarn deduplicate
   test_unit:
     <<: *defaults
     steps:
@@ -127,7 +173,21 @@ jobs:
             fi
       - run:
           name: Coverage
-          command: bash <(curl -s https://codecov.io/bash) -Z -C $CIRCLE_SHA1
+          command: bash <(curl -s https://codecov.io/bash) -Z -F $REACT_DIST_TAG
+  test_lint:
+    <<: *defaults
+    steps:
+      - checkout
+      - install_js
+      - run:
+          name: Eslint
+          command: yarn lint:ci
+      - run:
+          name: Stylelint
+          command: yarn stylelint
+      - run:
+          name: Lint JSON
+          command: yarn jsonlint
   test_static:
     <<: *defaults
     steps:
@@ -161,15 +221,6 @@ jobs:
           name: '`yarn workspace framer build` changes committed?'
           command: git diff --exit-code
       - run:
-          name: Eslint
-          command: yarn lint:ci
-      - run:
-          name: Stylelint
-          command: yarn stylelint
-      - run:
-          name: Lint JSON
-          command: yarn jsonlint
-      - run:
           name: '`yarn extract-error-codes` changes committed?'
           command: |
             yarn extract-error-codes
@@ -187,7 +238,7 @@ jobs:
           command: git add -A && git diff --exit-code --staged
       - run:
           name: Tests TypeScript definitions
-          command: yarn typescript
+          command: yarn typescript:ci
       - run:
           name: Test module augmenation
           command: yarn workspace @material-ui/core typescript:module-augmentation
@@ -243,7 +294,7 @@ jobs:
             # without --no-bail we only see at most a single failing package
             yarn typescript --no-bail
             exit 0
-      
+
       - restore_cache:
           name: Restore generated declaration files
           keys:
@@ -277,7 +328,8 @@ jobs:
           NODE_ENV: development # Needed if playwright is in `devDependencies`
     steps:
       - checkout
-      - install_js
+      - install_js:
+          browsers: true
       - run:
           name: Tests real browsers
           command: yarn test:karma
@@ -297,10 +349,10 @@ jobs:
       - image: mcr.microsoft.com/playwright:bionic
         environment:
           NODE_ENV: development # Needed if playwright is in `devDependencies`
-
     steps:
       - checkout
-      - install_js
+      - install_js:
+          browsers: true
       - run:
           name: Tests real browsers
           # Run a couple of times for a better sample.
@@ -326,7 +378,8 @@ jobs:
           NODE_ENV: development # Needed if playwright is in `devDependencies`
     steps:
       - checkout
-      - install_js
+      - install_js:
+          browsers: true
       - run:
           name: Run visual regression tests
           command: xvfb-run yarn test:regressions
@@ -343,6 +396,9 @@ workflows:
       - test_unit:
           requires:
             - checkout
+      - test_lint:
+          requires:
+            - checkout
       - test_static:
           requires:
             - checkout
@@ -354,10 +410,7 @@ workflows:
             - checkout
       - test_regressions:
           requires:
-            - test_unit
-            - test_static
-            - test_types
-            - test_browser
+            - checkout
   profile:
     when:
       equal: [profile, << pipeline.parameters.workflow >>]
@@ -378,9 +431,6 @@ workflows:
       - test_browser:
           react-dist-tag: next
       - test_regressions:
-          requires:
-            - test_unit
-            - test_browser
           react-dist-tag: next
   typescript-next:
     triggers:

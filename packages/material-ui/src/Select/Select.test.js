@@ -474,7 +474,7 @@ describe('<Select />', () => {
       const { getByRole } = render(<Select value="" />);
 
       // TODO what is the accessible name actually?
-      expect(getByRole('button')).to.not.have.attribute('aria-labelledby');
+      expect(getByRole('button')).not.to.have.attribute('aria-labelledby');
     });
 
     it('is labelled by itself when it has a name', () => {
@@ -1111,5 +1111,24 @@ describe('<Select />', () => {
       </Select>,
     );
     expect(document.activeElement).to.equal(getByRole('button'));
+  });
+
+  it('should not override the event.target on mouse events', () => {
+    const handleChange = spy();
+    const handleEvent = spy((event) => event.target);
+    render(
+      <div onClick={handleEvent}>
+        <Select open onChange={handleChange} value="second">
+          <MenuItem value="first" />
+          <MenuItem value="second" />
+        </Select>
+      </div>,
+    );
+
+    const options = screen.getAllByRole('option');
+    options[0].click();
+
+    expect(handleChange.callCount).to.equal(1);
+    expect(handleEvent.returnValues).to.have.members([options[0]]);
   });
 });

@@ -2,11 +2,17 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import { spy, stub } from 'sinon';
 import { expect } from 'chai';
-import { createMount, describeConformanceV5, act, createClientRender, fireEvent } from 'test/utils';
+import {
+  createMount,
+  describeConformanceV5,
+  act,
+  createClientRender,
+  fireEvent,
+  screen,
+} from 'test/utils';
 import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import { SliderUnstyled } from '@material-ui/unstyled';
-import clsx from 'clsx';
-import Slider, { sliderClasses as classes } from './Slider';
+import Slider, { sliderClasses as classes } from '@material-ui/core/Slider';
 
 function createTouches(touches) {
   return {
@@ -103,7 +109,7 @@ describe('<Slider />', () => {
     expect(handleChangeCommitted.callCount).to.equal(1);
   });
 
-  it('should edge against a dropped mouseup event', () => {
+  it('should hedge against a dropped mouseup event', () => {
     const handleChange = spy();
     const { container } = render(<Slider onChange={handleChange} value={0} />);
     stub(container.firstChild, 'getBoundingClientRect').callsFake(() => ({
@@ -473,7 +479,7 @@ describe('<Slider />', () => {
     it('should render the disabled classes', () => {
       const { container, getByRole } = render(<Slider disabled value={0} />);
       expect(container.firstChild).to.have.class(classes.disabled);
-      expect(getByRole('slider')).to.not.have.attribute('tabIndex');
+      expect(getByRole('slider')).not.to.have.attribute('tabIndex');
     });
 
     it('should not respond to drag events after becoming disabled', function test() {
@@ -503,7 +509,7 @@ describe('<Slider />', () => {
 
       setProps({ disabled: true });
       expect(thumb).not.toHaveFocus();
-      expect(thumb).to.not.have.class(classes.active);
+      expect(thumb).not.to.have.class(classes.active);
 
       fireEvent.touchMove(
         container.firstChild,
@@ -527,7 +533,7 @@ describe('<Slider />', () => {
       });
       setProps({ disabled: true });
       expect(thumb).not.toHaveFocus();
-      expect(thumb).to.not.have.class(classes.focusVisible);
+      expect(thumb).not.to.have.class(classes.focusVisible);
     });
   });
 
@@ -702,14 +708,14 @@ describe('<Slider />', () => {
       function ValueLabelComponent(props) {
         const { value, open } = props;
         return (
-          <span data-testid="value-label" className={clsx({ open })}>
+          <span data-testid="value-label" className={open ? 'open' : ''}>
             {value}
           </span>
         );
       }
       ValueLabelComponent.propTypes = { value: PropTypes.number };
 
-      const screen = render(
+      const { setProps } = render(
         <Slider
           components={{ ValueLabel: ValueLabelComponent }}
           valueLabelDisplay="on"
@@ -719,7 +725,7 @@ describe('<Slider />', () => {
 
       expect(screen.queryByTestId('value-label')).to.have.class('open');
 
-      screen.setProps({
+      setProps({
         valueLabelDisplay: 'off',
       });
 
@@ -944,7 +950,8 @@ describe('<Slider />', () => {
     });
 
     expect(handleChange.callCount).to.equal(1);
-    expect(handleChange.firstCall.returnValue).to.deep.equal({
+    const target = handleChange.firstCall.returnValue;
+    expect(target).to.deep.equal({
       name: 'change-testing',
       value: 4,
     });
@@ -968,6 +975,121 @@ describe('<Slider />', () => {
       );
 
       expect(getByTestId('value-label')).to.have.text('1010');
+    });
+  });
+
+  it('should not override the event.target on touch events', () => {
+    const handleChange = spy();
+    const handleNativeEvent = spy((event) => event.target);
+    const handleEvent = spy((event) => event.target);
+    function Test() {
+      React.useEffect(() => {
+        document.addEventListener('touchstart', handleNativeEvent);
+        return () => {
+          document.removeEventListener('touchstart', handleNativeEvent);
+        };
+      });
+
+      return (
+        <div onTouchStart={handleEvent}>
+          <Slider data-testid="slider" value={0} onChange={handleChange} />
+        </div>
+      );
+    }
+    render(<Test />);
+    const slider = screen.getByTestId('slider');
+
+    fireEvent.touchStart(slider, createTouches([{ identifier: 1 }]));
+
+    expect(handleChange.callCount).to.equal(1);
+    expect(handleNativeEvent.returnValues).to.have.members([slider]);
+    expect(handleEvent.returnValues).to.have.members([slider]);
+  });
+
+  it('should not override the event.target on mouse events', () => {
+    const handleChange = spy();
+    const handleNativeEvent = spy((event) => event.target);
+    const handleEvent = spy((event) => event.target);
+    function Test() {
+      React.useEffect(() => {
+        document.addEventListener('mousedown', handleNativeEvent);
+        return () => {
+          document.removeEventListener('mousedown', handleNativeEvent);
+        };
+      });
+
+      return (
+        <div onMouseDown={handleEvent}>
+          <Slider data-testid="slider" value={0} onChange={handleChange} />
+        </div>
+      );
+    }
+    render(<Test />);
+    const slider = screen.getByTestId('slider');
+
+    fireEvent.mouseDown(slider);
+
+    expect(handleChange.callCount).to.equal(1);
+    expect(handleNativeEvent.returnValues).to.have.members([slider]);
+    expect(handleEvent.returnValues).to.have.members([slider]);
+  });
+
+  describe('dragging state', () => {
+    it('should not apply class name for click modality', () => {
+      const { container } = render(<Slider defaultValue={90} />);
+
+      stub(container.firstChild, 'getBoundingClientRect').callsFake(() => ({
+        width: 100,
+        height: 10,
+        bottom: 10,
+        left: 0,
+      }));
+
+      fireEvent.touchStart(
+        container.firstChild,
+        createTouches([{ identifier: 1, clientX: 20, clientY: 0 }]),
+      );
+      fireEvent.touchMove(
+        document.body,
+        createTouches([{ identifier: 1, clientX: 21, clientY: 0 }]),
+      );
+      expect(container.firstChild).not.to.have.class(classes.dragging);
+      fireEvent.touchEnd(document.body, createTouches([{ identifier: 1 }]));
+    });
+
+    it('should apply class name for dragging modality', () => {
+      const { container } = render(<Slider defaultValue={90} />);
+
+      stub(container.firstChild, 'getBoundingClientRect').callsFake(() => ({
+        width: 100,
+        height: 10,
+        bottom: 10,
+        left: 0,
+      }));
+
+      fireEvent.touchStart(
+        container.firstChild,
+        createTouches([{ identifier: 1, clientX: 20, clientY: 0 }]),
+      );
+      fireEvent.touchMove(
+        document.body,
+        createTouches([{ identifier: 1, clientX: 200, clientY: 0 }]),
+      );
+      fireEvent.touchMove(
+        document.body,
+        createTouches([{ identifier: 1, clientX: 200, clientY: 0 }]),
+      );
+
+      expect(container.firstChild).not.to.have.class(classes.dragging);
+
+      fireEvent.touchMove(
+        document.body,
+        createTouches([{ identifier: 1, clientX: 200, clientY: 0 }]),
+      );
+
+      expect(container.firstChild).to.have.class(classes.dragging);
+      fireEvent.touchEnd(document.body, createTouches([{ identifier: 1 }]));
+      expect(container.firstChild).not.to.have.class(classes.dragging);
     });
   });
 });

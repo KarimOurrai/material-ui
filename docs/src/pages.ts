@@ -1,4 +1,4 @@
-import findPages from /* preval */ 'docs/src/modules/utils/findPages';
+import pagesApi from './pagesApi';
 
 export interface MuiPage {
   pathname: string;
@@ -134,7 +134,7 @@ const pages: MuiPage[] = [
           { pathname: '/components/data-grid/selection' },
           { pathname: '/components/data-grid/editing', title: '🚧 Editing' },
           { pathname: '/components/data-grid/rendering' },
-          { pathname: '/components/data-grid/export', title: '🚧 Export & Import' },
+          { pathname: '/components/data-grid/export', title: 'Export & Import' },
           { pathname: '/components/data-grid/localization', title: '🚧 Localization' },
           { pathname: '/components/data-grid/group-pivot', title: '🚧 Group & Pivot' },
           { pathname: '/components/data-grid/accessibility' },
@@ -184,7 +184,7 @@ const pages: MuiPage[] = [
     title: 'Component API',
     pathname: '/api-docs',
     children: [
-      ...findPages[0].children!,
+      ...pagesApi,
       ...[{ pathname: '/api-docs/data-grid' }, { pathname: '/api-docs/x-grid' }],
     ]
       .sort((a, b) =>

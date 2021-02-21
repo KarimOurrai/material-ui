@@ -6,9 +6,13 @@ import MobileWrapper from '../internal/pickers/wrappers/MobileWrapper';
  * @ignore - do not document.
  */
 /* @typescript-to-proptypes-generate */
-const MobileDateRangePicker = makeDateRangePicker('MuiPickersDateRangePicker', MobileWrapper);
+const MobileDateRangePicker = makeDateRangePicker('MuiMobileDateRangePicker', MobileWrapper);
 
-(MobileDateRangePicker as any).propTypes = {
+if (process.env.NODE_ENV !== 'production') {
+  (MobileDateRangePicker as any).displayName = 'MobileDateRangePicker';
+}
+
+MobileDateRangePicker.propTypes = {
   // ----------------------------- Warning --------------------------------
   // | These PropTypes are generated from the TypeScript type definitions |
   // |     To update them edit TypeScript types and run "yarn proptypes"  |
@@ -34,7 +38,7 @@ const MobileDateRangePicker = makeDateRangePicker('MuiPickersDateRangePicker', M
    */
   calendars: PropTypes.oneOf([1, 2, 3]),
   /**
-   * Cancel text message
+   * Cancel text message.
    * @default "CANCEL"
    */
   cancelText: PropTypes.node,
@@ -52,7 +56,7 @@ const MobileDateRangePicker = makeDateRangePicker('MuiPickersDateRangePicker', M
    */
   clearable: PropTypes.bool,
   /**
-   * Clear text message
+   * Clear text message.
    * @default "CLEAR"
    */
   clearText: PropTypes.node,
@@ -75,7 +79,7 @@ const MobileDateRangePicker = makeDateRangePicker('MuiPickersDateRangePicker', M
    */
   componentsProps: PropTypes.object,
   /**
-   * Allows to pass configured date-io adapter directly. More info [here](https://next.material-ui-pickers.dev/guides/date-adapter-passing)
+   * Allows to pass configured date-io adapter directly. More info [here](https://next.material-ui-pickers.dev/guides/date-adapter-passing).
    * ```jsx
    * dateAdapter={new AdapterDateFns({ locale: ruLocale })}
    * ```
@@ -91,7 +95,7 @@ const MobileDateRangePicker = makeDateRangePicker('MuiPickersDateRangePicker', M
    */
   DialogProps: PropTypes.object,
   /**
-   * if `true` after selecting `start` date  calendar will not automatically switch to the month of `end` date
+   * If `true`, after selecting `start` date calendar will not automatically switch to the month of `end` date.
    * @default false
    */
   disableAutoMonthSwitching: PropTypes.bool,
@@ -178,7 +182,7 @@ const MobileDateRangePicker = makeDateRangePicker('MuiPickersDateRangePicker', M
    */
   loading: PropTypes.bool,
   /**
-   * Custom mask. Can be used to override generate from format. (e.g. __/__/____ __:__ or __/__/____ __:__ _M)
+   * Custom mask. Can be used to override generate from format. (e.g. `__/__/____ __:__` or `__/__/____ __:__ _M`).
    */
   mask: PropTypes.string,
   /**
@@ -201,7 +205,7 @@ const MobileDateRangePicker = makeDateRangePicker('MuiPickersDateRangePicker', M
    */
   onAccept: PropTypes.func,
   /**
-   * Callback fired when the value (the selected date) changes. @DateIOType.
+   * Callback fired when the value (the selected date) changes @DateIOType.
    */
   onChange: PropTypes.func.isRequired,
   /**
@@ -299,7 +303,7 @@ const MobileDateRangePicker = makeDateRangePicker('MuiPickersDateRangePicker', M
   shouldDisableDate: PropTypes.func,
   /**
    * Disable specific years dynamically.
-   * Works like `shouldDisableDate` but for year selection view. @DateIOType.
+   * Works like `shouldDisableDate` but for year selection view @DateIOType.
    */
   shouldDisableYear: PropTypes.func,
   /**
@@ -322,7 +326,7 @@ const MobileDateRangePicker = makeDateRangePicker('MuiPickersDateRangePicker', M
    */
   startText: PropTypes.node,
   /**
-   * Today text message
+   * Today text message.
    * @default "TODAY"
    */
   todayText: PropTypes.node,
@@ -355,7 +359,7 @@ const MobileDateRangePicker = makeDateRangePicker('MuiPickersDateRangePicker', M
       PropTypes.string,
     ]),
   ).isRequired,
-};
+} as any;
 
 export type MobileDateRangePickerProps = React.ComponentProps<typeof MobileDateRangePicker>;
 

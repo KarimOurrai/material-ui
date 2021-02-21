@@ -1,8 +1,15 @@
+export { default as BackdropUnstyled } from './BackdropUnstyled';
+export * from './BackdropUnstyled';
+
 export { default as BadgeUnstyled } from './BadgeUnstyled';
 export * from './BadgeUnstyled';
 
 export { default as SliderUnstyled } from './SliderUnstyled';
 export * from './SliderUnstyled';
+
+export { default as Portal } from './Portal';
+
+export { default as Unstable_TrapFocus } from './Unstable_TrapFocus';
 
 export { default as generateUtilityClass } from './generateUtilityClass';
 

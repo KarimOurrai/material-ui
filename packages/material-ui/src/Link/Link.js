@@ -75,8 +75,8 @@ const LinkRoot = experimentalStyled(
       cursor: 'pointer',
       userSelect: 'none',
       verticalAlign: 'middle',
-      '-moz-appearance': 'none', // Reset
-      '-webkit-appearance': 'none', // Reset
+      MozAppearance: 'none', // Reset
+      WebkitAppearance: 'none', // Reset
       '&::-moz-focus-inner': {
         borderStyle: 'none', // Remove Firefox dotted outline.
       },
@@ -180,15 +180,7 @@ Link.propTypes = {
    * The color of the link.
    * @default 'primary'
    */
-  color: PropTypes.oneOf([
-    'error',
-    'inherit',
-    'initial',
-    'primary',
-    'secondary',
-    'textPrimary',
-    'textSecondary',
-  ]),
+  color: PropTypes /* @typescript-to-proptypes-ignore */.any,
   /**
    * The component used for the root node.
    * Either a string to use a HTML element or a component.

@@ -14,17 +14,17 @@ export interface ExportedPickerModalProps {
    */
   okText?: React.ReactNode;
   /**
-   * Cancel text message
+   * Cancel text message.
    * @default "CANCEL"
    */
   cancelText?: React.ReactNode;
   /**
-   * Clear text message
+   * Clear text message.
    * @default "CLEAR"
    */
   clearText?: React.ReactNode;
   /**
-   * Today text message
+   * Today text message.
    * @default "TODAY"
    */
   todayText?: React.ReactNode;
@@ -44,7 +44,7 @@ export interface ExportedPickerModalProps {
   DialogProps?: Partial<MuiDialogProps>;
 }
 
-export interface PickerModalDialogProps extends ExportedPickerModalProps {
+export interface PickersModalDialogProps extends ExportedPickerModalProps {
   onAccept: () => void;
   onClear: () => void;
   onDismiss: () => void;
@@ -83,7 +83,7 @@ export const styles: MuiStyles<PickersModalDialogClassKey> = {
   },
 };
 
-const PickersModalDialog: React.FC<PickerModalDialogProps & WithStyles<typeof styles>> = (
+const PickersModalDialog: React.FC<PickersModalDialogProps & WithStyles<typeof styles>> = (
   props,
 ) => {
   const {

@@ -6,7 +6,7 @@ import MonthPicker from '../MonthPicker/MonthPicker';
 import { useCalendarState } from './useCalendarState';
 import { useUtils } from '../internal/pickers/hooks/useUtils';
 import FadeTransitionGroup from './PickersFadeTransitionGroup';
-import Calendar, { ExportedCalendarProps } from './PickersCalendar';
+import PickersCalendar, { ExportedCalendarProps } from './PickersCalendar';
 import { PickerOnChangeFn, useViews } from '../internal/pickers/hooks/useViews';
 import { DAY_SIZE, DAY_MARGIN } from '../internal/pickers/constants/dimensions';
 import PickersCalendarHeader, { ExportedCalendarHeaderProps } from './PickersCalendarHeader';
@@ -224,7 +224,7 @@ const DayPicker = React.forwardRef(function DayPicker<
           )}
 
           {openView === 'date' && (
-            <Calendar
+            <PickersCalendar
               {...other}
               {...calendarState}
               onMonthSwitchingAnimationEnd={onMonthSwitchingAnimationEnd}
@@ -244,7 +244,7 @@ const DayPicker = React.forwardRef(function DayPicker<
   );
 });
 
-(DayPicker as any).propTypes = {
+DayPicker.propTypes = {
   // ----------------------------- Warning --------------------------------
   // | These PropTypes are generated from the TypeScript type definitions |
   // |     To update them edit TypeScript types and run "yarn proptypes"  |
@@ -329,7 +329,7 @@ const DayPicker = React.forwardRef(function DayPicker<
   shouldDisableDate: PropTypes.func,
   /**
    * Disable specific years dynamically.
-   * Works like `shouldDisableDate` but for year selection view. @DateIOType.
+   * Works like `shouldDisableDate` but for year selection view @DateIOType.
    */
   shouldDisableYear: PropTypes.func,
   /**
@@ -340,7 +340,7 @@ const DayPicker = React.forwardRef(function DayPicker<
    * Views for day picker.
    */
   views: PropTypes.arrayOf(PropTypes.oneOf(['date', 'month', 'year']).isRequired),
-};
+} as any;
 
 export default withStyles(styles, { name: 'MuiDayPicker' })(DayPicker) as <TDate>(
   props: DayPickerProps<TDate> & React.RefAttributes<HTMLDivElement>,

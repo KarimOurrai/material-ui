@@ -2,14 +2,12 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import { chainPropTypes, deepmerge } from '@material-ui/utils';
-import {
-  SliderUnstyled,
+import { generateUtilityClasses, isHostComponent } from '@material-ui/unstyled';
+import SliderUnstyled, {
   SliderValueLabelUnstyled,
   sliderUnstyledClasses,
   getSliderUtilityClass,
-  generateUtilityClasses,
-  isHostComponent,
-} from '@material-ui/unstyled';
+} from '@material-ui/unstyled/SliderUnstyled';
 import useThemeProps from '../styles/useThemeProps';
 import experimentalStyled from '../styles/experimentalStyled';
 import { alpha, lighten, darken } from '../styles/colorManipulator';
@@ -124,6 +122,11 @@ export const SliderRoot = experimentalStyled(
     transform: 'rotate(45deg)',
     textAlign: 'center',
   },
+  [`&.${sliderClasses.dragging}`]: {
+    [`& .${sliderClasses.thumb}, & .${sliderClasses.track}`]: {
+      transition: 'none',
+    },
+  },
 }));
 
 export const SliderRail = experimentalStyled(
@@ -157,6 +160,9 @@ export const SliderTrack = experimentalStyled(
   height: 2,
   borderRadius: 1,
   backgroundColor: 'currentColor',
+  transition: theme.transitions.create(['left', 'width'], {
+    duration: theme.transitions.duration.shortest,
+  }),
   ...(styleProps.orientation === 'vertical' && {
     width: 2,
   }),
@@ -189,7 +195,7 @@ export const SliderThumb = experimentalStyled(
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  transition: theme.transitions.create(['box-shadow'], {
+  transition: theme.transitions.create(['box-shadow', 'left'], {
     duration: theme.transitions.duration.shortest,
   }),
   '&::after': {
@@ -548,7 +554,9 @@ Slider.propTypes = {
   /**
    * Callback function that is fired when the slider's value changed.
    *
-   * @param {object} event The event source of the callback. **Warning**: This is a generic event not a change event.
+   * @param {object} event The event source of the callback.
+   * You can pull out the new value by accessing `event.target.value` (any).
+   * **Warning**: This is a generic event not a change event.
    * @param {number | number[]} value The new value.
    */
   onChange: PropTypes.func,

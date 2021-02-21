@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { makePickerWithStateAndWrapper } from '../internal/pickers/Picker/makePickerWithState';
+import { makePickerWithState } from '../internal/pickers/Picker/makePickerWithState';
 import {
   BaseDateTimePickerProps,
   dateTimePickerConfig,
@@ -11,15 +11,16 @@ import { MobileWrapper } from '../internal/pickers/wrappers/Wrapper';
  * @ignore - do not document.
  */
 /* @typescript-to-proptypes-generate */
-const MobileDateTimePicker = makePickerWithStateAndWrapper<BaseDateTimePickerProps<unknown>>(
-  MobileWrapper,
-  {
-    name: 'MuiMobileDateTimePicker',
-    ...dateTimePickerConfig,
-  },
-) as DateTimePickerGenericComponent<typeof MobileWrapper>;
+const MobileDateTimePicker = makePickerWithState<BaseDateTimePickerProps<unknown>>(MobileWrapper, {
+  name: 'MuiMobileDateTimePicker',
+  ...dateTimePickerConfig,
+}) as DateTimePickerGenericComponent<typeof MobileWrapper>;
 
-(MobileDateTimePicker as any).propTypes = {
+if (process.env.NODE_ENV !== 'production') {
+  (MobileDateTimePicker as any).displayName = 'MobileDateTimePicker';
+}
+
+MobileDateTimePicker.propTypes = {
   // ----------------------------- Warning --------------------------------
   // | These PropTypes are generated from the TypeScript type definitions |
   // |     To update them edit TypeScript types and run "yarn proptypes"  |
@@ -50,7 +51,7 @@ const MobileDateTimePicker = makePickerWithStateAndWrapper<BaseDateTimePickerPro
    */
   ampmInClock: PropTypes.bool,
   /**
-   * Cancel text message
+   * Cancel text message.
    * @default "CANCEL"
    */
   cancelText: PropTypes.node,
@@ -68,7 +69,7 @@ const MobileDateTimePicker = makePickerWithStateAndWrapper<BaseDateTimePickerPro
    */
   clearable: PropTypes.bool,
   /**
-   * Clear text message
+   * Clear text message.
    * @default "CLEAR"
    */
   clearText: PropTypes.node,
@@ -91,7 +92,7 @@ const MobileDateTimePicker = makePickerWithStateAndWrapper<BaseDateTimePickerPro
    */
   componentsProps: PropTypes.object,
   /**
-   * Allows to pass configured date-io adapter directly. More info [here](https://next.material-ui-pickers.dev/guides/date-adapter-passing)
+   * Allows to pass configured date-io adapter directly. More info [here](https://next.material-ui-pickers.dev/guides/date-adapter-passing).
    * ```jsx
    * dateAdapter={new AdapterDateFns({ locale: ruLocale })}
    * ```
@@ -202,7 +203,7 @@ const MobileDateTimePicker = makePickerWithStateAndWrapper<BaseDateTimePickerPro
    */
   loading: PropTypes.bool,
   /**
-   * Custom mask. Can be used to override generate from format. (e.g. __/__/____ __:__ or __/__/____ __:__ _M)
+   * Custom mask. Can be used to override generate from format. (e.g. `__/__/____ __:__` or `__/__/____ __:__ _M`).
    */
   mask: PropTypes.string,
   /**
@@ -274,7 +275,7 @@ const MobileDateTimePicker = makePickerWithStateAndWrapper<BaseDateTimePickerPro
    */
   onAccept: PropTypes.func,
   /**
-   * Callback fired when the value (the selected date) changes. @DateIOType.
+   * Callback fired when the value (the selected date) changes @DateIOType.
    */
   onChange: PropTypes.func.isRequired,
   /**
@@ -338,7 +339,7 @@ const MobileDateTimePicker = makePickerWithStateAndWrapper<BaseDateTimePickerPro
    */
   reduceAnimations: PropTypes.bool,
   /**
-   * Custom renderer for day. Check [DayComponentProps api](https://material-ui-pickers.dev/api/Day) @DateIOType.
+   * Custom renderer for day. Check the [PickersDay](https://material-ui.com/api/pickers-day/) component.
    */
   renderDay: PropTypes.func,
   /**
@@ -374,7 +375,7 @@ const MobileDateTimePicker = makePickerWithStateAndWrapper<BaseDateTimePickerPro
   shouldDisableTime: PropTypes.func,
   /**
    * Disable specific years dynamically.
-   * Works like `shouldDisableDate` but for year selection view. @DateIOType.
+   * Works like `shouldDisableDate` but for year selection view @DateIOType.
    */
   shouldDisableYear: PropTypes.func,
   /**
@@ -396,7 +397,7 @@ const MobileDateTimePicker = makePickerWithStateAndWrapper<BaseDateTimePickerPro
    */
   timeIcon: PropTypes.node,
   /**
-   * Today text message
+   * Today text message.
    * @default "TODAY"
    */
   todayText: PropTypes.node,
@@ -433,7 +434,7 @@ const MobileDateTimePicker = makePickerWithStateAndWrapper<BaseDateTimePickerPro
   views: PropTypes.arrayOf(
     PropTypes.oneOf(['date', 'hours', 'minutes', 'month', 'year']).isRequired,
   ),
-};
+} as any;
 
 export type MobileDateTimePickerProps = React.ComponentProps<typeof MobileDateTimePicker>;
 

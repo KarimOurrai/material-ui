@@ -8,7 +8,11 @@ import StaticWrapper from '../internal/pickers/wrappers/StaticWrapper';
 /* @typescript-to-proptypes-generate */
 const StaticDateRangePicker = makeDateRangePicker('MuiPickersDateRangePicker', StaticWrapper);
 
-(StaticDateRangePicker as any).propTypes = {
+if (process.env.NODE_ENV !== 'production') {
+  (StaticDateRangePicker as any).displayName = 'StaticDateRangePicker';
+}
+
+StaticDateRangePicker.propTypes = {
   // ----------------------------- Warning --------------------------------
   // | These PropTypes are generated from the TypeScript type definitions |
   // |     To update them edit TypeScript types and run "yarn proptypes"  |
@@ -60,7 +64,7 @@ const StaticDateRangePicker = makeDateRangePicker('MuiPickersDateRangePicker', S
    */
   componentsProps: PropTypes.object,
   /**
-   * Allows to pass configured date-io adapter directly. More info [here](https://next.material-ui-pickers.dev/guides/date-adapter-passing)
+   * Allows to pass configured date-io adapter directly. More info [here](https://next.material-ui-pickers.dev/guides/date-adapter-passing).
    * ```jsx
    * dateAdapter={new AdapterDateFns({ locale: ruLocale })}
    * ```
@@ -72,7 +76,7 @@ const StaticDateRangePicker = makeDateRangePicker('MuiPickersDateRangePicker', S
    */
   defaultCalendarMonth: PropTypes.any,
   /**
-   * if `true` after selecting `start` date  calendar will not automatically switch to the month of `end` date
+   * If `true`, after selecting `start` date calendar will not automatically switch to the month of `end` date.
    * @default false
    */
   disableAutoMonthSwitching: PropTypes.bool,
@@ -111,7 +115,7 @@ const StaticDateRangePicker = makeDateRangePicker('MuiPickersDateRangePicker', S
    */
   disablePast: PropTypes.bool,
   /**
-   * Force static wrapper inner components to be rendered in mobile or desktop mode
+   * Force static wrapper inner components to be rendered in mobile or desktop mode.
    * @default "static"
    */
   displayStaticWrapperAs: PropTypes.oneOf(['desktop', 'mobile']),
@@ -164,7 +168,7 @@ const StaticDateRangePicker = makeDateRangePicker('MuiPickersDateRangePicker', S
    */
   loading: PropTypes.bool,
   /**
-   * Custom mask. Can be used to override generate from format. (e.g. __/__/____ __:__ or __/__/____ __:__ _M)
+   * Custom mask. Can be used to override generate from format. (e.g. `__/__/____ __:__` or `__/__/____ __:__ _M`).
    */
   mask: PropTypes.string,
   /**
@@ -182,7 +186,7 @@ const StaticDateRangePicker = makeDateRangePicker('MuiPickersDateRangePicker', S
    */
   onAccept: PropTypes.func,
   /**
-   * Callback fired when the value (the selected date) changes. @DateIOType.
+   * Callback fired when the value (the selected date) changes @DateIOType.
    */
   onChange: PropTypes.func.isRequired,
   /**
@@ -280,7 +284,7 @@ const StaticDateRangePicker = makeDateRangePicker('MuiPickersDateRangePicker', S
   shouldDisableDate: PropTypes.func,
   /**
    * Disable specific years dynamically.
-   * Works like `shouldDisableDate` but for year selection view. @DateIOType.
+   * Works like `shouldDisableDate` but for year selection view @DateIOType.
    */
   shouldDisableYear: PropTypes.func,
   /**
@@ -326,7 +330,7 @@ const StaticDateRangePicker = makeDateRangePicker('MuiPickersDateRangePicker', S
       PropTypes.string,
     ]),
   ).isRequired,
-};
+} as any;
 
 export type StaticDateRangePickerProps = React.ComponentProps<typeof StaticDateRangePicker>;
 

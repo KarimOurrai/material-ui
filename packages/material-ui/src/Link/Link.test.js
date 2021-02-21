@@ -2,8 +2,8 @@ import * as React from 'react';
 import { expect } from 'chai';
 import { spy } from 'sinon';
 import { createMount, act, createClientRender, fireEvent, describeConformanceV5 } from 'test/utils';
-import Link from './Link';
-import Typography, { typographyClasses } from '../Typography';
+import Link from '@material-ui/core/Link';
+import Typography, { typographyClasses } from '@material-ui/core/Typography';
 import classes from './linkClasses';
 
 function focusVisible(element) {
@@ -32,16 +32,16 @@ describe('<Link />', () => {
   it('should render children', () => {
     const { queryByText } = render(<Link href="/">Home</Link>);
 
-    expect(queryByText('Home')).to.not.equal(null);
+    expect(queryByText('Home')).not.to.equal(null);
   });
 
   it('should pass props to the <Typography> component', () => {
     const { container } = render(
-      <Link href="/" color="primary">
+      <Link href="/" variant="body2">
         Test
       </Link>,
     );
-    expect(container.firstChild).to.have.class(typographyClasses.colorPrimary);
+    expect(container.firstChild).to.have.class(typographyClasses.body2);
   });
 
   describe('event callbacks', () => {
@@ -73,7 +73,7 @@ describe('<Link />', () => {
       const { container } = render(<Link href="/">Home</Link>);
       const anchor = container.querySelector('a');
 
-      expect(anchor).to.not.have.class(classes.focusVisible);
+      expect(anchor).not.to.have.class(classes.focusVisible);
 
       focusVisible(anchor);
 
@@ -83,7 +83,7 @@ describe('<Link />', () => {
         anchor.blur();
       });
 
-      expect(anchor).to.not.have.class(classes.focusVisible);
+      expect(anchor).not.to.have.class(classes.focusVisible);
     });
   });
 });

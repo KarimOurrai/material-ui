@@ -72,6 +72,13 @@ Support for non-ref-forwarding class components in the `component` prop or as im
 Otherwise check out the ["Caveat with refs" section in our composition guide](/guides/composition/#caveat-with-refs) to find out how to migrate.
 This change affects almost all components where you're using the `component` prop or passing `children` to components that require `children` to be elements (e.g. `<MenuList><CustomMenuItem /></MenuList>`)
 
+### Supported TypeScript version
+
+The minimum supported version of TypeScript was increased from v3.2 to v3.5.
+We try to align with types released from [DefinitelyTyped](https://github.com/DefinitelyTyped/DefinitelyTyped) (i.e. packages published on npm under the `@types` namespace).
+We will not change the minimum supported version in a major version of Material-UI.
+However, we generally recommend to not use a TypeScript version older than the [lowest supported version of DefinitelyTyped](https://github.com/DefinitelyTyped/DefinitelyTyped#older-versions-of-typescript-33-and-earlier)
+
 ### Styled engine
 
 The styled engine used in v5 by default is [`emotion`](https://github.com/emotion-js/emotion). While migration from JSS to emotion, if you are using JSS style overrides for your components (for example overrides created by `makeStyles`), you need to take care of the CSS injection order. In order to do this, you need to have on the top of your application the `StylesProvider` with the `injectFirst` option. Here is an example of it:
@@ -272,11 +279,27 @@ const classes = makeStyles(theme => ({
 
 ### System
 
-- The following system functions (and properties) were renamed, because they are considered deprecated CSS:
+- The following system functions (and properties) were renamed because they are considered deprecated CSS:
 
-1. `gridGap` to `gap`
-2. `gridColumnGap` to `columnGap`
-3. `gridRowGap` to `rowGap`
+  1. `gridGap` to `gap`
+  1. `gridRowGap` to `rowGap`
+  1. `gridColumnGap` to `columnGap`
+
+- Use spacing unit in `gap`, `rowGap`, and `columnGap`. If you were using a number previously, you need to mention the px to bypass the new transformation with `theme.spacing`.
+
+  ```diff
+  <Box
+  - gap={2}
+  + gap="2px"
+  >
+  ```
+
+- Replace `css` prop with `sx` to avoid collision with styled-components & emotion CSS props.
+
+```diff
+-<Box css={{ color: 'primary.main' }} />
++<Box sx={{ color: 'primary.main' }} />
+```
 
 ### Core components
 
@@ -1220,24 +1243,42 @@ As the core components use emotion as a styled engine, the props used by emotion
 
 ### Typography
 
-- Replace the `srOnly` prop so as to not duplicate the capabilities of [System](https://material-ui.com/system/basics/):
+- Remove the `srOnly` variant. You can use the `visuallyHidden` utility in conjunction with the `sx` prop instead.
 
   ```diff
-  -import Typography from '@material-ui/core/Typography';
-  +import { visuallyHidden } from '@material-ui/system';
-  +import styled from 'styled-component';
-
-  +const Span = styled('span')(visuallyHidden);
+  +import { visuallyHidden } from '@material-ui/utils';
 
   -<Typography variant="srOnly">Create a user</Typography>
-  +<Span>Create a user</Span>
+  +<span style={visuallyHidden}>Create a user</span>
   ```
 
-### System
+- The following `classes` and style overrides keys were removed: "colorInherit", "colorPrimary", "colorSecondary", "colorTextPrimary", "colorTextSecondary", "colorError", "displayInline" and "displayBlock". These props are now considered part of the system, not on the `Typography` component itself. If you still wish to add overrides for them, you can use the `theme.components.MuiTypography.variants` options. For example
 
-- Replace `css` prop with `sx` to avoid collision with styled-components & emotion CSS props.
+  ```diff
+  const theme = createMuiTheme({
+    components: {
+      MuiTypography: {
+  -     styleOverrides: {
+  -       colorSecondary: {
+  -         marginTop: '20px',
+  -       },
+  -     },
+  +     variants: {
+  +       props: { color: "secondary" },
+  +       style: {
+  +         marginTop: '20px',
+  +       },
+  +     }],
+      },
+    },
+  });
+  ```
+
+### `@material-ui/types`
+
+- Rename the exported `Omit` type in `@material-ui/types`. The module is now called `DistributiveOmit`. The change removes the confusion with the built-in `Omit` helper introduced in TypeScript v3.5. The built-in `Omit`, while similar, is non-distributive. This leads to differences when applied to union types. [See this StackOverflow answer for further details](https://stackoverflow.com/a/57103940/1009797).
 
 ```diff
--<Box css={{ color: 'primary.main' }} />
-+<Box sx={{ color: 'primary.main' }} />
+-import { Omit } from '@material-ui/types';
++import { DistributiveOmit } from '@material-ui/types';
 ```

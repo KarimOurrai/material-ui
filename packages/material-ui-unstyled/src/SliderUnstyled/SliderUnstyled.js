@@ -16,6 +16,8 @@ import composeClasses from '../composeClasses';
 import { getSliderUtilityClass } from './sliderUnstyledClasses';
 import SliderValueLabelUnstyled from './SliderValueLabelUnstyled';
 
+const INTENTIONAL_DRAG_COUNT_THRESHOLD = 2;
+
 function asc(a, b) {
   return a - b;
 }
@@ -151,12 +153,13 @@ function doesSupportTouchActionNone() {
 }
 
 const useUtilityClasses = (styleProps) => {
-  const { disabled, marked, orientation, track, classes } = styleProps;
+  const { disabled, dragging, marked, orientation, track, classes } = styleProps;
 
   const slots = {
     root: [
       'root',
       disabled && 'disabled',
+      dragging && 'dragging',
       marked && 'marked',
       orientation === 'vertical' && 'vertical',
       track === 'inverted' && 'trackInverted',
@@ -186,7 +189,7 @@ const SliderUnstyled = React.forwardRef(function SliderUnstyled(props, ref) {
     'aria-labelledby': ariaLabelledby,
     'aria-valuetext': ariaValuetext,
     className,
-    component: Component = 'span',
+    component = 'span',
     classes: classesProp = {},
     defaultValue,
     disabled = false,
@@ -220,6 +223,8 @@ const SliderUnstyled = React.forwardRef(function SliderUnstyled(props, ref) {
   // - The active state isn't transferred when inversing a range slider.
   const [active, setActive] = React.useState(-1);
   const [open, setOpen] = React.useState(-1);
+  const [dragging, setDragging] = React.useState(false);
+  const moveCount = React.useRef(0);
 
   const [valueDerived, setValueState] = useControlled({
     controlled: valueProp,
@@ -230,17 +235,19 @@ const SliderUnstyled = React.forwardRef(function SliderUnstyled(props, ref) {
   const handleChange =
     onChange &&
     ((event, value) => {
-      if (!(event instanceof Event)) event.persist();
-
       // Redefine target to allow name and value to be read.
       // This allows seamless integration with the most popular form libraries.
       // https://github.com/mui-org/material-ui/issues/13485#issuecomment-676048492
-      Object.defineProperty(event, 'target', {
+      // Clone the event to not override `target` of the original event.
+      const nativeEvent = event.nativeEvent || event;
+      const clonedEvent = new nativeEvent.constructor(nativeEvent.type, nativeEvent);
+
+      Object.defineProperty(clonedEvent, 'target', {
         writable: true,
         value: { value, name },
       });
 
-      onChange(event, value);
+      onChange(clonedEvent, value);
     });
 
   const range = Array.isArray(valueDerived);
@@ -413,6 +420,8 @@ const SliderUnstyled = React.forwardRef(function SliderUnstyled(props, ref) {
       return;
     }
 
+    moveCount.current += 1;
+
     // Cancel move in case some other element consumed a mouseup event and it was not fired.
     if (nativeEvent.type === 'mousemove' && nativeEvent.buttons === 0) {
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
@@ -430,6 +439,10 @@ const SliderUnstyled = React.forwardRef(function SliderUnstyled(props, ref) {
     focusThumb({ sliderRef, activeIndex, setActive });
     setValueState(newValue);
 
+    if (!dragging && moveCount.current > INTENTIONAL_DRAG_COUNT_THRESHOLD) {
+      setDragging(true);
+    }
+
     if (handleChange) {
       handleChange(nativeEvent, newValue);
     }
@@ -437,6 +450,7 @@ const SliderUnstyled = React.forwardRef(function SliderUnstyled(props, ref) {
 
   const handleTouchEnd = useEventCallback((nativeEvent) => {
     const finger = trackFinger(nativeEvent, touchId);
+    setDragging(false);
 
     if (!finger) {
       return;
@@ -459,27 +473,28 @@ const SliderUnstyled = React.forwardRef(function SliderUnstyled(props, ref) {
     stopListening();
   });
 
-  const handleTouchStart = useEventCallback((event) => {
+  const handleTouchStart = useEventCallback((nativeEvent) => {
     // If touch-action: none; is not supported we need to prevent the scroll manually.
     if (!doesSupportTouchActionNone()) {
-      event.preventDefault();
+      nativeEvent.preventDefault();
     }
 
-    const touch = event.changedTouches[0];
+    const touch = nativeEvent.changedTouches[0];
     if (touch != null) {
       // A number that uniquely identifies the current finger in the touch session.
       touchId.current = touch.identifier;
     }
-    const finger = trackFinger(event, touchId);
+    const finger = trackFinger(nativeEvent, touchId);
     const { newValue, activeIndex } = getFingerNewValue({ finger, values, source: valueDerived });
     focusThumb({ sliderRef, activeIndex, setActive });
 
     setValueState(newValue);
 
     if (handleChange) {
-      handleChange(event, newValue);
+      handleChange(nativeEvent, newValue);
     }
 
+    moveCount.current = 0;
     const doc = ownerDocument(sliderRef.current);
     doc.addEventListener('touchmove', handleTouchMove);
     doc.addEventListener('touchend', handleTouchEnd);
@@ -536,6 +551,7 @@ const SliderUnstyled = React.forwardRef(function SliderUnstyled(props, ref) {
       handleChange(event, newValue);
     }
 
+    moveCount.current = 0;
     const doc = ownerDocument(sliderRef.current);
     doc.addEventListener('mousemove', handleTouchMove);
     doc.addEventListener('mouseup', handleTouchEnd);
@@ -548,7 +564,7 @@ const SliderUnstyled = React.forwardRef(function SliderUnstyled(props, ref) {
     ...axisProps[axis].leap(trackLeap),
   };
 
-  const Root = components.Root || 'span';
+  const Root = components.Root || component;
   const rootProps = componentsProps.root || {};
 
   const Rail = components.Rail || 'span';
@@ -575,6 +591,7 @@ const SliderUnstyled = React.forwardRef(function SliderUnstyled(props, ref) {
     ...props,
     classes: {},
     disabled,
+    dragging,
     max,
     min,
     orientation,
@@ -595,7 +612,7 @@ const SliderUnstyled = React.forwardRef(function SliderUnstyled(props, ref) {
       onMouseDown={handleMouseDown}
       {...rootProps}
       {...(!isHostComponent(Root) && {
-        as: Component,
+        as: component,
         styleProps: { ...styleProps, ...rootProps.styleProps },
         theme,
       })}
@@ -708,8 +725,8 @@ const SliderUnstyled = React.forwardRef(function SliderUnstyled(props, ref) {
                 onMouseLeave={handleMouseLeave}
                 {...thumbProps}
                 className={clsx(utilityClasses.thumb, thumbProps.className, {
-                  [utilityClasses['active']]: active === index,
-                  [utilityClasses['focusVisible']]: focusVisible === index,
+                  [utilityClasses.active]: active === index,
+                  [utilityClasses.focusVisible]: focusVisible === index,
                 })}
                 {...(!isHostComponent(Thumb) && {
                   styleProps: { ...styleProps, ...thumbProps.styleProps },
@@ -892,7 +909,9 @@ SliderUnstyled.propTypes = {
   /**
    * Callback function that is fired when the slider's value changed.
    *
-   * @param {object} event The event source of the callback. **Warning**: This is a generic event not a change event.
+   * @param {object} event The event source of the callback.
+   * You can pull out the new value by accessing `event.target.value` (any).
+   * **Warning**: This is a generic event not a change event.
    * @param {number | number[]} value The new value.
    */
   onChange: PropTypes.func,

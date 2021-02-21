@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { makePickerWithStateAndWrapper } from '../internal/pickers/Picker/makePickerWithState';
+import { makePickerWithState } from '../internal/pickers/Picker/makePickerWithState';
 import {
   BaseTimePickerProps,
   timePickerConfig,
@@ -14,10 +14,14 @@ import { DesktopWrapper } from '../internal/pickers/wrappers/Wrapper';
  *
  * - [DesktopTimePicker API](https://material-ui.com/api/desktop-time-picker/)
  */
-const DesktopTimePicker = makePickerWithStateAndWrapper<BaseTimePickerProps>(DesktopWrapper, {
+const DesktopTimePicker = makePickerWithState<BaseTimePickerProps>(DesktopWrapper, {
   name: 'MuiDesktopTimePicker',
   ...timePickerConfig,
 }) as TimePickerGenericComponent<typeof DesktopWrapper>;
+
+if (process.env.NODE_ENV !== 'production') {
+  (DesktopTimePicker as any).displayName = 'DesktopTimePicker';
+}
 
 DesktopTimePicker.propTypes = {
   // ----------------------------- Warning --------------------------------
@@ -53,7 +57,7 @@ DesktopTimePicker.propTypes = {
    */
   className: PropTypes.string,
   /**
-   * Allows to pass configured date-io adapter directly. More info [here](https://next.material-ui-pickers.dev/guides/date-adapter-passing)
+   * Allows to pass configured date-io adapter directly. More info [here](https://next.material-ui-pickers.dev/guides/date-adapter-passing).
    * ```jsx
    * dateAdapter={new AdapterDateFns({ locale: ruLocale })}
    * ```
@@ -118,7 +122,7 @@ DesktopTimePicker.propTypes = {
    */
   label: PropTypes.node,
   /**
-   * Custom mask. Can be used to override generate from format. (e.g. __/__/____ __:__ or __/__/____ __:__ _M)
+   * Custom mask. Can be used to override generate from format. (e.g. `__/__/____ __:__` or `__/__/____ __:__ _M`).
    */
   mask: PropTypes.string,
   /**
@@ -149,7 +153,7 @@ DesktopTimePicker.propTypes = {
    */
   onAccept: PropTypes.func,
   /**
-   * Callback fired when the value (the selected date) changes. @DateIOType.
+   * Callback fired when the value (the selected date) changes @DateIOType.
    */
   onChange: PropTypes.func.isRequired,
   /**
@@ -256,7 +260,7 @@ DesktopTimePicker.propTypes = {
    * Array of views to show.
    */
   views: PropTypes.arrayOf(PropTypes.oneOf(['hours', 'minutes', 'seconds']).isRequired),
-};
+} as any;
 
 export type DesktopTimePickerProps = React.ComponentProps<typeof DesktopTimePicker>;
 

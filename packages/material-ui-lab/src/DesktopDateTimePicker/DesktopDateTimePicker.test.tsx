@@ -1,7 +1,7 @@
 import * as React from 'react';
 import TextField from '@material-ui/core/TextField';
 import { expect } from 'chai';
-import { useFakeTimers, SinonFakeTimers } from 'sinon';
+import { useFakeTimers, SinonFakeTimers, spy } from 'sinon';
 import { fireEvent, screen } from 'test/utils';
 import 'dayjs/locale/ru';
 import dayjs from 'dayjs';
@@ -20,9 +20,9 @@ describe('<DesktopDateTimePicker />', () => {
     clock.restore();
   });
 
-  const render = createPickerRender({ strict: false });
+  const render = createPickerRender();
 
-  it('opens dialog on calendar button click for Mobile mode', () => {
+  it('opens dialog on calendar button click', () => {
     render(
       <DesktopDateTimePicker
         value={null}
@@ -33,6 +33,56 @@ describe('<DesktopDateTimePicker />', () => {
 
     fireEvent.click(screen.getByLabelText(/choose date/i));
     expect(screen.getByRole('dialog')).toBeVisible();
+  });
+
+  it('closes on clickaway', () => {
+    const handleClose = spy();
+    render(
+      <DesktopDateTimePicker
+        onChange={() => {}}
+        renderInput={(params) => <TextField {...params} />}
+        value={null}
+        open
+        onClose={handleClose}
+      />,
+    );
+
+    fireEvent.click(document.body);
+
+    expect(handleClose.callCount).to.equal(1);
+  });
+
+  it('does not close on clickaway when it is not open', () => {
+    const handleClose = spy();
+    render(
+      <DesktopDateTimePicker
+        onChange={() => {}}
+        renderInput={(params) => <TextField {...params} />}
+        value={null}
+        onClose={handleClose}
+      />,
+    );
+
+    fireEvent.click(document.body);
+
+    expect(handleClose.callCount).to.equal(0);
+  });
+
+  it('does not close on click inside', () => {
+    const handleClose = spy();
+    render(
+      <DesktopDateTimePicker
+        onChange={() => {}}
+        renderInput={(params) => <TextField {...params} />}
+        value={null}
+        open
+        onClose={handleClose}
+      />,
+    );
+
+    fireEvent.click(screen.getByLabelText('pick time'));
+
+    expect(handleClose.callCount).to.equal(0);
   });
 
   it('prop: dateAdapter – allows to override date adapter with prop', () => {
@@ -85,7 +135,7 @@ describe('<DesktopDateTimePicker />', () => {
     );
 
     expect(screen.getByLabelText('25 minutes')).to.have.class('Mui-disabled');
-    expect(screen.getByLabelText('35 minutes')).to.not.have.class('Mui-disabled');
+    expect(screen.getByLabelText('35 minutes')).not.to.have.class('Mui-disabled');
   });
 
   it('prop: minDateTime – hours is disabled by date part', () => {
@@ -131,5 +181,33 @@ describe('<DesktopDateTimePicker />', () => {
 
     fireEvent.click(screen.getByLabelText('open next view'));
     expect(screen.getByLabelText('open next view')).to.have.attribute('disabled');
+  });
+
+  describe('prop: PopperProps', () => {
+    it('forwards onClick and onTouchStart', () => {
+      const handleClick = spy();
+      const handleTouchStart = spy();
+      render(
+        <DesktopDateTimePicker
+          open
+          onChange={() => {}}
+          PopperProps={{
+            onClick: handleClick,
+            onTouchStart: handleTouchStart,
+            // @ts-expect-error `data-*` attributes are not recognized in props objects
+            'data-testid': 'popper',
+          }}
+          renderInput={(params) => <TextField {...params} />}
+          value={null}
+        />,
+      );
+      const popper = screen.getByTestId('popper');
+
+      fireEvent.click(popper);
+      fireEvent.touchStart(popper);
+
+      expect(handleClick.callCount).to.equal(1);
+      expect(handleTouchStart.callCount).to.equal(1);
+    });
   });
 });

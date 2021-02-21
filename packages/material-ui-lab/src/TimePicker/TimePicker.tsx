@@ -17,7 +17,7 @@ import {
 import { SomeWrapper } from '../internal/pickers/wrappers/Wrapper';
 import {
   SharedPickerProps,
-  makePickerWithStateAndWrapper,
+  makePickerWithState,
 } from '../internal/pickers/Picker/makePickerWithState';
 
 export interface BaseTimePickerProps<TDate = unknown>
@@ -76,7 +76,7 @@ export const timePickerConfig = {
 
 export type TimePickerGenericComponent<TWrapper extends SomeWrapper> = (<TDate>(
   props: BaseTimePickerProps<TDate> & SharedPickerProps<TDate, TWrapper>,
-) => JSX.Element) & { propTypes?: unknown };
+) => JSX.Element) & { propTypes?: any };
 
 /**
  *
@@ -89,7 +89,7 @@ export type TimePickerGenericComponent<TWrapper extends SomeWrapper> = (<TDate>(
  * - [TimePicker API](https://material-ui.com/api/time-picker/)
  */
 // @typescript-to-proptypes-generate
-const TimePicker = makePickerWithStateAndWrapper<BaseTimePickerProps>(ResponsiveWrapper, {
+const TimePicker = makePickerWithState<BaseTimePickerProps>(ResponsiveWrapper, {
   name: 'MuiTimePicker',
   ...timePickerConfig,
 }) as TimePickerGenericComponent<typeof ResponsiveWrapper>;
@@ -120,7 +120,7 @@ TimePicker.propTypes = {
    */
   ampmInClock: PropTypes.bool,
   /**
-   * Cancel text message
+   * Cancel text message.
    * @default "CANCEL"
    */
   cancelText: PropTypes.node,
@@ -138,12 +138,12 @@ TimePicker.propTypes = {
    */
   clearable: PropTypes.bool,
   /**
-   * Clear text message
+   * Clear text message.
    * @default "CLEAR"
    */
   clearText: PropTypes.node,
   /**
-   * Allows to pass configured date-io adapter directly. More info [here](https://next.material-ui-pickers.dev/guides/date-adapter-passing)
+   * Allows to pass configured date-io adapter directly. More info [here](https://next.material-ui-pickers.dev/guides/date-adapter-passing).
    * ```jsx
    * dateAdapter={new AdapterDateFns({ locale: ruLocale })}
    * ```
@@ -218,7 +218,7 @@ TimePicker.propTypes = {
    */
   label: PropTypes.node,
   /**
-   * Custom mask. Can be used to override generate from format. (e.g. __/__/____ __:__ or __/__/____ __:__ _M)
+   * Custom mask. Can be used to override generate from format. (e.g. `__/__/____ __:__` or `__/__/____ __:__ _M`).
    */
   mask: PropTypes.string,
   /**
@@ -254,7 +254,7 @@ TimePicker.propTypes = {
    */
   onAccept: PropTypes.func,
   /**
-   * Callback fired when the value (the selected date) changes. @DateIOType.
+   * Callback fired when the value (the selected date) changes @DateIOType.
    */
   onChange: PropTypes.func.isRequired,
   /**
@@ -332,7 +332,7 @@ TimePicker.propTypes = {
    */
   showToolbar: PropTypes.bool,
   /**
-   * Today text message
+   * Today text message.
    * @default "TODAY"
    */
   todayText: PropTypes.node,
@@ -371,7 +371,7 @@ TimePicker.propTypes = {
    * Array of views to show.
    */
   views: PropTypes.arrayOf(PropTypes.oneOf(['hours', 'minutes', 'seconds']).isRequired),
-};
+} as any;
 
 export type TimePickerProps = React.ComponentProps<typeof TimePicker>;
 
